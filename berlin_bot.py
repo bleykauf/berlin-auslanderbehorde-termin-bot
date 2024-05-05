@@ -1,6 +1,6 @@
 import logging
-import os
 import time
+from pathlib import Path
 from platform import system
 
 from playsound import playsound
@@ -47,7 +47,7 @@ class WebDriver:
 class BerlinBot:
     def __init__(self):
         self.wait_time = 20
-        self._sound_file = os.path.join(os.getcwd(), "alarm.wav")
+        self._sound_file = str(Path.cwd() / "alarm.wav")
         self._error_message = (
             """Für die gewählte Dienstleistung sind aktuell keine Termine frei! Bitte"""
         )
