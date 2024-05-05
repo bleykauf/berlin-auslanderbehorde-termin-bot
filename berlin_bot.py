@@ -60,7 +60,7 @@ class BerlinBot:
             By.XPATH,
             '//*[@id="mainForm"]/div/div/div/div/div/div/div/div/div/div[1]/div[1]/div[2]/a',  # noqa: E501
         ).click()
-        time.sleep(5)
+        time.sleep(1)
 
     @staticmethod
     def tick_off_some_bullshit(driver: webdriver.Chrome):
@@ -68,37 +68,38 @@ class BerlinBot:
         driver.find_element(By.XPATH, '//*[@id="xi-div-1"]/div[4]/label[2]/p').click()
         time.sleep(1)
         driver.find_element(By.ID, "applicationForm:managedForm:proceed").click()
-        time.sleep(5)
+        time.sleep(1)
 
     @staticmethod
     def enter_form(driver: webdriver.Chrome):
         logging.info("Fill out form")
-        # select china
+        # select Colombia
         s = Select(driver.find_element(By.ID, "xi-sel-400"))
-        s.select_by_visible_text("China")
-        # eine person
+        s.select_by_visible_text("Kolumbien")
+        # one person
         s = Select(driver.find_element(By.ID, "xi-sel-422"))
         s.select_by_visible_text("eine Person")
-        # no family
+        # married
         s = Select(driver.find_element(By.ID, "xi-sel-427"))
-        s.select_by_visible_text("nein")
-        time.sleep(5)
+        s.select_by_visible_text("ja")
+        # nationality of partner
+        s = Select(driver.find_element(By.ID, "xi-sel-428"))
+        s.select_by_visible_text("Deutschland")
+        time.sleep(3)
 
-        # extend stay
-        driver.find_element(By.XPATH, '//*[@id="xi-div-30"]/div[2]/label/p').click()
-        time.sleep(2)
-
-        # click on study group
+        # click on the 3rd blue card
+        logging.info("Selecting card")
+        n_card = 3
         driver.find_element(
-            By.XPATH, '//*[@id="inner-479-0-2"]/div/div[1]/label/p'
+            By.XPATH, f'//*[@id="xi-div-30"]/div[{n_card}]/label/p'
+        ).click()
+
+        # select transfer visa to new passport
+        logging.info("Select radio buton")
+        driver.find_element(
+            By.XPATH, ".//input[@type='radio' and @value='349-0-3-99-121874']"
         ).click()
         time.sleep(2)
-
-        # b/c of stufy
-        driver.find_element(
-            By.XPATH, '//*[@id="inner-479-0-2"]/div/div[2]/div/div[5]/label'
-        ).click()
-        time.sleep(4)
 
         # submit form
         driver.find_element(By.ID, "applicationForm:managedForm:proceed").click()
