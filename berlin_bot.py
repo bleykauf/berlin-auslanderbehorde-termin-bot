@@ -1,18 +1,24 @@
 import logging
+import os
 import time
 from pathlib import Path
 
+from dotenv import load_dotenv
 from playsound import playsound
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
+from telebot import TeleBot
 
 logging.basicConfig(
     format="%(asctime)s\t%(levelname)s\t%(message)s",
     level=logging.INFO,
 )
 
+load_dotenv()
 
+TELEGRAM_KEY = os.getenv("TELEGRAM_KEY")
+CHAT_ID = int(os.getenv("CHAT_ID"))
 NO_APPOINTMENTS_MSG = (
     "Für die gewählte Dienstleistung sind aktuell keine Termine frei! Bitte"
 )
@@ -68,12 +74,15 @@ def fill_out_form(driver: webdriver.Chrome):
     # select Colombia
     s = Select(driver.find_element(By.ID, "xi-sel-400"))
     s.select_by_visible_text("Kolumbien")
+    time.sleep(0.5)
     # one person
     s = Select(driver.find_element(By.ID, "xi-sel-422"))
     s.select_by_visible_text("eine Person")
+    time.sleep(0.5)
     # married
     s = Select(driver.find_element(By.ID, "xi-sel-427"))
     s.select_by_visible_text("ja")
+    time.sleep(0.5)
     # nationality of partner
     s = Select(driver.find_element(By.ID, "xi-sel-428"))
     s.select_by_visible_text("Deutschland")
@@ -83,6 +92,7 @@ def fill_out_form(driver: webdriver.Chrome):
     logging.info("Selecting card")
     n_card = 3
     driver.find_element(By.XPATH, f'//*[@id="xi-div-30"]/div[{n_card}]/label/p').click()
+    time.sleep(1)
 
     # select transfer visa to new passport
     logging.info("Select radio buton")
@@ -97,16 +107,18 @@ def submit_form(driver: webdriver.Chrome):
 
 
 class BerlinBot:
-    def on_success(self):
+    def on_success(self, telebot):
         logging.info("Sucess: do not close the window.")
+        # telebot.send_message(CHAT_ID, "New appointments available!")
         while True:
             playsound(str(Path.cwd() / "alarm.wav"))
             time.sleep(15)
 
-    def on_startup(self):
+    def on_startup(self, telebot):
+        # telebot.send_message(CHAT_ID, "Start looking for appointments!")
         playsound(str(Path.cwd() / "alarm.wav"))
 
-    def find_appointments(self, n_attempts=10, time_between_attempts=20):
+    def find_appointments(self, telebot, n_attempts=10, time_between_attempts=20):
         with WebDriver() as driver:
             enter_start_page(driver)
             tick_off_terms(driver)
@@ -117,15 +129,17 @@ class BerlinBot:
             for _ in range(n_attempts):
                 submit_form(driver)
                 if NO_APPOINTMENTS_MSG not in driver.page_source:
-                    self.on_success()
+                    self.on_success(telebot)
                 time.sleep(time_between_attempts)
 
     def run_continously(self, attempts_per_session=10, time_between_attempts=20):
-        self.on_startup()
+        telebot = TeleBot(TELEGRAM_KEY)
+        self.on_startup(telebot)
         while True:
             try:
                 logging.info("One more round")
                 self.find_appointments(
+                    telebot,
                     n_attempts=attempts_per_session,
                     time_between_attempts=time_between_attempts,
                 )

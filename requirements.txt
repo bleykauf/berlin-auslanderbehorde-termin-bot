@@ -1,2 +1,4 @@
 selenium==4.20.0
 playsound>=1.2.2
+pyTelegramBotAPI>=4.17.0
+python-dotenv>=1.0.1
