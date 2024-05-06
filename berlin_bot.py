@@ -1,14 +1,11 @@
 import logging
 import time
 from pathlib import Path
-from platform import system
 
 from playsound import playsound
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
-
-system = system()
 
 logging.basicConfig(
     format="%(asctime)s\t%(levelname)s\t%(message)s",
@@ -16,7 +13,9 @@ logging.basicConfig(
 )
 
 
-ERROR_MESSAGE = "Für die gewählte Dienstleistung sind aktuell keine Termine frei! Bitte"
+NO_APPOINTMENTS_MSG = (
+    "Für die gewählte Dienstleistung sind aktuell keine Termine frei! Bitte"
+)
 
 
 class WebDriver:
@@ -114,7 +113,7 @@ class BerlinBot:
             # (re)try submitting the form
             for _ in range(n_attempts):
                 submit_form(driver)
-                if ERROR_MESSAGE not in driver.page_source:
+                if NO_APPOINTMENTS_MSG not in driver.page_source:
                     self.on_success()
                 time.sleep(time_between_attempts)
 
