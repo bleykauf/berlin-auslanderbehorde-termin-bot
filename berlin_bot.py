@@ -103,7 +103,10 @@ class BerlinBot:
             playsound(str(Path.cwd() / "alarm.wav"))
             time.sleep(15)
 
-    def run(self, n_attempts=10, time_between_attempts=20):
+    def on_startup(self):
+        playsound(str(Path.cwd() / "alarm.wav"))
+
+    def find_appointments(self, n_attempts=10, time_between_attempts=20):
         with WebDriver() as driver:
             enter_start_page(driver)
             tick_off_terms(driver)
@@ -118,14 +121,18 @@ class BerlinBot:
                 time.sleep(time_between_attempts)
 
     def run_continously(self, attempts_per_session=10, time_between_attempts=20):
-        playsound(str(Path.cwd() / "alarm.wav"))  # play sound to check if it works
+        self.on_startup()
         while True:
-            logging.info("One more round")
-            self.run(
-                n_attempts=attempts_per_session,
-                time_between_attempts=time_between_attempts,
-            )
-            time.sleep(time_between_attempts)
+            try:
+                logging.info("One more round")
+                self.find_appointments(
+                    n_attempts=attempts_per_session,
+                    time_between_attempts=time_between_attempts,
+                )
+                time.sleep(time_between_attempts)
+            except Exception:
+                logging.exception("An exception occured. Trying again.")
+                time.sleep(1)
 
 
 def main():
