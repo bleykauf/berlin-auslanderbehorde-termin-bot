@@ -109,13 +109,13 @@ def submit_form(driver: webdriver.Chrome):
 class BerlinBot:
     def on_success(self, telebot):
         logging.info("Sucess: do not close the window.")
-        # telebot.send_message(CHAT_ID, "New appointments available!")
+        telebot.send_message(CHAT_ID, "New appointments available!")
         while True:
             playsound(str(Path.cwd() / "alarm.wav"))
             time.sleep(15)
 
     def on_startup(self, telebot):
-        # telebot.send_message(CHAT_ID, "Start looking for appointments!")
+        telebot.send_message(CHAT_ID, "Start looking for appointments!")
         playsound(str(Path.cwd() / "alarm.wav"))
 
     def find_appointments(self, telebot, n_attempts=10, time_between_attempts=20):
