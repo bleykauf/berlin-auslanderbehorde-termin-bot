@@ -147,6 +147,8 @@ class BerlinBot:
             except Exception:
                 logging.exception("An exception occured. Trying again.")
                 time.sleep(1)
+            finally:
+                telebot.send_message(CHAT_ID, "Stopped looking for appointments.")
 
 
 def main():
