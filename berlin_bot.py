@@ -33,6 +33,9 @@ class WebDriver:
         # some stuff that prevents us from being locked out
         options = webdriver.ChromeOptions()
         options.add_argument("--disable-blink-features=AutomationControlled")
+        # NOTE: You may want to remove the next line for adjusting the script or for
+        # debugging
+        options.add_argument("--headless")
         self.driver = webdriver.Chrome(options=options)
         self.driver.implicitly_wait(20)  # seconds
         self.driver.execute_script(
@@ -108,7 +111,7 @@ def submit_form(driver: webdriver.Chrome):
 
 class BerlinBot:
     def on_success(self, telebot):
-        logging.info("Sucess: do not close the window.")
+        logging.info("Sucess: New appointments available.")
         telebot.send_message(CHAT_ID, "New appointments available!")
         while True:
             playsound(str(Path.cwd() / "alarm.wav"))
