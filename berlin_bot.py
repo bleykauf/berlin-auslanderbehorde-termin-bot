@@ -20,8 +20,9 @@ load_dotenv()
 TELEGRAM_KEY = os.getenv("TELEGRAM_KEY")
 CHAT_ID = int(os.getenv("CHAT_ID"))
 NO_APPOINTMENTS_MSG = (
-    "Für die gewählte Dienstleistung sind aktuell keine Termine frei! Bitte"
+    "Für die gewählte 0Dienstleistung sind aktuell keine Termine frei! Bitte"
 )
+MAINTENANCE_MSG = "Aktuell finden Wartungsarbeiten an der"
 
 
 class WebDriver:
@@ -57,6 +58,13 @@ class WebDriver:
 def enter_start_page(driver: webdriver.Chrome):
     logging.info("Visit start page")
     driver.get("https://otv.verwalt-berlin.de/ams/TerminBuchen")
+    while True:
+        if MAINTENANCE_MSG in driver.page_source:
+            logging.info("Page under maintenance, trying again.")
+            time.sleep(10)
+            driver.refresh()
+        else:
+            break
     driver.find_element(
         By.XPATH,
         '//*[@id="mainForm"]/div/div/div/div/div/div/div/div/div/div[1]/div[1]/div[2]/a',  # noqa: 501
