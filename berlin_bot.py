@@ -4,7 +4,7 @@ import time
 from pathlib import Path
 
 from dotenv import load_dotenv
-from playsound import playsound
+from playsound import playsound, PlaysoundException
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
@@ -20,7 +20,7 @@ load_dotenv()
 TELEGRAM_KEY = os.getenv("TELEGRAM_KEY")
 CHAT_ID = int(os.getenv("CHAT_ID"))
 NO_APPOINTMENTS_MSG = (
-    "Für die gewählte 0Dienstleistung sind aktuell keine Termine frei! Bitte"
+    "Für die gewählte Dienstleistung sind aktuell keine Termine frei! Bitte"
 )
 MAINTENANCE_MSG = "Aktuell finden Wartungsarbeiten an der"
 
@@ -36,7 +36,7 @@ class WebDriver:
         options.add_argument("--disable-blink-features=AutomationControlled")
         # NOTE: You may want to remove the next line for adjusting the script or for
         # debugging
-        options.add_argument("--headless")
+        # options.add_argument("--headless")
         self.driver = webdriver.Chrome(options=options)
         self.driver.implicitly_wait(20)  # seconds
         self.driver.execute_script(
@@ -122,12 +122,18 @@ class BerlinBot:
         logging.info("Sucess: New appointments available.")
         telebot.send_message(CHAT_ID, "New appointments available!")
         while True:
-            playsound(str(Path.cwd() / "alarm.wav"))
-            time.sleep(15)
+            try:
+                playsound(str(Path.cwd() / "alarm.wav"))
+                time.sleep(15)
+            except PlaysoundException as e:
+                logging.error(f"Problem with playing sound: {e}")
 
     def on_startup(self, telebot):
         telebot.send_message(CHAT_ID, "Start looking for appointments!")
-        playsound(str(Path.cwd() / "alarm.wav"))
+        try:
+            playsound(str(Path.cwd() / "alarm.wav"))
+        except PlaysoundException as e:
+            logging.error(f"Problem with playing sound: {e}")
 
     def find_appointments(self, telebot, n_attempts=10, time_between_attempts=20):
         with WebDriver() as driver:
