@@ -152,20 +152,21 @@ class BerlinBot:
     def run_continously(self, attempts_per_session=10, time_between_attempts=20):
         telebot = TeleBot(TELEGRAM_KEY)
         self.on_startup(telebot)
-        while True:
-            try:
-                logging.info("One more round")
-                self.find_appointments(
-                    telebot,
-                    n_attempts=attempts_per_session,
-                    time_between_attempts=time_between_attempts,
-                )
-                time.sleep(time_between_attempts)
-            except Exception:
-                logging.exception("An exception occured. Trying again.")
-                time.sleep(1)
-            finally:
-                telebot.send_message(CHAT_ID, "Stopped looking for appointments.")
+        try:
+            while True:
+                try:
+                    logging.info("One more round")
+                    self.find_appointments(
+                        telebot,
+                        n_attempts=attempts_per_session,
+                        time_between_attempts=time_between_attempts,
+                    )
+                    time.sleep(time_between_attempts)
+                except Exception:
+                    logging.exception("An exception occured. Trying again.")
+                    time.sleep(1)
+        finally:
+            telebot.send_message(CHAT_ID, "Stopped looking for appointments.")
 
 
 def main():
